@@ -23,7 +23,7 @@ export default function InventoryView() {
   const [showModal, setShowModal] = useState(false);
 
   const fetchInventory = async () => {
-    const res = await axios.get("http://localhost:4000/api/inventory");
+    const res = await axios.get("${import.meta.env.VITE_API_URL}/inventory");
     setItems(res.data);
   };
 
@@ -33,9 +33,9 @@ export default function InventoryView() {
 
   const handleSubmit = async () => {
     if (isEditing && editId) {
-      await axios.put(`http://localhost:4000/api/inventory/${editId}`, form);
+      await axios.put(`${import.meta.env.VITE_API_URL}/inventory/${editId}`, form);
     } else {
-      await axios.post("http://localhost:4000/api/inventory", form);
+      await axios.post("${import.meta.env.VITE_API_URL}/inventory", form);
     }
     setForm({ name: "", stock: 0, minStock: 0, provider: "" });
     setIsEditing(false);
@@ -57,7 +57,7 @@ export default function InventoryView() {
   };
 
   const handleDelete = async (id: string) => {
-    await axios.delete(`http://localhost:4000/api/inventory/${id}`);
+    await axios.delete(`${import.meta.env.VITE_API_URL}/inventory/${id}`);
     fetchInventory();
   };
 

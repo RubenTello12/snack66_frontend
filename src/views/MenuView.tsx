@@ -17,7 +17,7 @@ export default function MenuView() {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/categories");
+      const res = await axios.get("${import.meta.env.VITE_API_URL}/categories");
       setCategories(res.data);
     } catch (error) {
       console.error("Error al cargar categorías:", error);
@@ -38,7 +38,7 @@ export default function MenuView() {
     formData.append("image", imageFile);
 
     try {
-      await axios.post("http://localhost:4000/api/categories", formData, {
+      await axios.post("${import.meta.env.VITE_API_URL}/categories", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setName("");

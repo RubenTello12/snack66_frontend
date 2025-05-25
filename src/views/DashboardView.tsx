@@ -29,7 +29,7 @@ export default function DashboardView() {
 
   const markAsPaid = async (orderId: string) => {
     try {
-      await axios.patch(`http://localhost:4000/api/orders/${orderId}/status`, { status: "pagado" });
+      await axios.patch(`${import.meta.env.VITE_API_URL}/orders/${orderId}/status`, { status: "pagado" });
       setPendingOrders(prev => prev.filter(order => order._id !== orderId)); // eliminar de UI
     } catch (error) {
       console.error("Error al marcar como pagada:", error);
@@ -38,7 +38,7 @@ export default function DashboardView() {
 
   const markAsReady = async (orderId: string) => {
     try {
-      await axios.patch(`http://localhost:4000/api/orders/${orderId}/status`, { status: "pago pendiente" });
+      await axios.patch(`${import.meta.env.VITE_API_URL}/orders/${orderId}/status`, { status: "pago pendiente" });
       fetchInProgressOrders();
       fetchPendingPaymentOrders(); 
     } catch (error) {
@@ -48,7 +48,7 @@ export default function DashboardView() {
 
   const fetchPendingPaymentOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/orders/pending-payment");
+      const res = await axios.get("${import.meta.env.VITE_API_URL}/orders/pending-payment");
       setPendingOrders(res.data);
     } catch (error) {
       console.error("Error al cargar órdenes de pago pendiente", error);
@@ -70,8 +70,8 @@ export default function DashboardView() {
 
   const handleDeleteOrder = async (orderId: string) => {
     try {
-      await axios.delete(`http://localhost:4000/api/orders/${orderId}`);
-      const res = await axios.get("http://localhost:4000/api/orders/in-progress");
+      await axios.delete(`${import.meta.env.VITE_API_URL}/orders/${orderId}`);
+      const res = await axios.get("${import.meta.env.VITE_API_URL}/orders/in-progress");
       setInProgressOrders(res.data);
     } catch (error) {
       console.error("Error al eliminar la orden:", error);
@@ -99,7 +99,7 @@ export default function DashboardView() {
 
   const fetchInProgressOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/orders/in-progress");
+      const res = await axios.get("${import.meta.env.VITE_API_URL}/orders/in-progress");
       setInProgressOrders(res.data);
     } catch (error) {
       console.error("Error al cargar órdenes en curso", error);
@@ -145,9 +145,9 @@ export default function DashboardView() {
 
     try {
       if (editingOrderId) {
-        await axios.patch(`http://localhost:4000/api/orders/${editingOrderId}`, payload);
+        await axios.patch(`${import.meta.env.VITE_API_URL}/orders/${editingOrderId}`, payload);
       } else {
-        await axios.post("http://localhost:4000/api/orders", payload);
+        await axios.post("${import.meta.env.VITE_API_URL}/orders", payload);
       }
 
       // resetear formulario

@@ -51,22 +51,22 @@ export default function CategoryDetailView() {
   });
 
   const fetchProducts = async () => {
-    const res = await axios.get(`http://localhost:4000/api/products?category=${id}`);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/products?category=${id}`);
     setProducts(res.data);
   };
 
   const fetchCategory = async () => {
-    const res = await axios.get(`http://localhost:4000/api/categories/${id}`);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/categories/${id}`);
     setCategoryName(res.data.name);
   };
 
   const fetchInventory = async () => {
-    const res = await axios.get("http://localhost:4000/api/inventory");
+    const res = await axios.get("${import.meta.env.VITE_API_URL}/inventory");
     setInventoryItems(res.data);
   };
 
   const fetchCategories = async () => {
-    const res = await axios.get("http://localhost:4000/api/categories");
+    const res = await axios.get("${import.meta.env.VITE_API_URL}/categories");
     setCategories(res.data);
   };
 
@@ -74,8 +74,8 @@ export default function CategoryDetailView() {
     try {
       if (confirmText !== categoryName) return;
 
-      await axios.delete(`http://localhost:4000/api/categories/${id}`);
-      await axios.delete(`http://localhost:4000/api/products/by-category/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/categories/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/products/by-category/${id}`);
 
       setShowConfirmModal(false);
       navigate("/menu");
@@ -96,9 +96,9 @@ export default function CategoryDetailView() {
     };
 
     if (editingId) {
-      await axios.put(`http://localhost:4000/api/products/${editingId}`, payload);
+      await axios.put(`${import.meta.env.VITE_API_URL}/products/${editingId}`, payload);
     } else {
-      await axios.post("http://localhost:4000/api/products", payload);
+      await axios.post("${import.meta.env.VITE_API_URL}/products", payload);
     }
 
     setShowModal(false);
@@ -122,7 +122,7 @@ export default function CategoryDetailView() {
   };
 
   const handleDeleteProduct = async (productId: string) => {
-    await axios.delete(`http://localhost:4000/api/products/${productId}`);
+    await axios.delete(`${import.meta.env.VITE_API_URL}/products/${productId}`);
     fetchProducts();
   };
 

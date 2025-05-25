@@ -28,12 +28,12 @@ export default function OrderProductListView() {
   const { addProduct } = useOrder();
 
   const fetchProducts = async () => {
-    const res = await axios.get(`http://localhost:4000/api/products?category=${id}`);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/products?category=${id}`);
     setProducts(res.data);
   };
 
   const fetchCategory = async () => {
-    const res = await axios.get(`http://localhost:4000/api/categories/${id}`);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/categories/${id}`);
     setCategoryName(res.data.name);
   };
 
