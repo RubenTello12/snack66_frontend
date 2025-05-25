@@ -36,6 +36,7 @@ export default function SettingsView() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      console.log(logoFile)
       setLogoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
