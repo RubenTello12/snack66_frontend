@@ -61,12 +61,12 @@ export default function CategoryDetailView() {
   };
 
   const fetchInventory = async () => {
-    const res = await axios.get("${import.meta.env.VITE_API_URL}/inventory");
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/inventory`);
     setInventoryItems(res.data);
   };
 
   const fetchCategories = async () => {
-    const res = await axios.get("${import.meta.env.VITE_API_URL}/categories");
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/categories`);
     setCategories(res.data);
   };
 
@@ -98,7 +98,7 @@ export default function CategoryDetailView() {
     if (editingId) {
       await axios.put(`${import.meta.env.VITE_API_URL}/products/${editingId}`, payload);
     } else {
-      await axios.post("${import.meta.env.VITE_API_URL}/products", payload);
+      await axios.post(`${import.meta.env.VITE_API_URL}/products`, payload);
     }
 
     setShowModal(false);

@@ -23,7 +23,7 @@ export default function InventoryView() {
   const [showModal, setShowModal] = useState(false);
 
   const fetchInventory = async () => {
-    const res = await axios.get("${import.meta.env.VITE_API_URL}/inventory");
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/inventory`);
     setItems(res.data);
   };
 
@@ -35,7 +35,7 @@ export default function InventoryView() {
     if (isEditing && editId) {
       await axios.put(`${import.meta.env.VITE_API_URL}/inventory/${editId}`, form);
     } else {
-      await axios.post("${import.meta.env.VITE_API_URL}/inventory", form);
+      await axios.post(`${import.meta.env.VITE_API_URL}/inventory`, form);
     }
     setForm({ name: "", stock: 0, minStock: 0, provider: "" });
     setIsEditing(false);

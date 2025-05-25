@@ -7,7 +7,7 @@ export default function OrdersView() {
   useEffect(() => {
     const fetchPaidOrders = async () => {
       try {
-        const res = await axios.get("${import.meta.env.VITE_API_URL}/orders/paid");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/orders/paid`);
         setPaidOrders(res.data);
       } catch (error) {
         console.error("Error al cargar órdenes pagadas", error);

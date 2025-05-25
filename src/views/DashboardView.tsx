@@ -48,7 +48,7 @@ export default function DashboardView() {
 
   const fetchPendingPaymentOrders = async () => {
     try {
-      const res = await axios.get("${import.meta.env.VITE_API_URL}/orders/pending-payment");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/orders/pending-payment`);
       setPendingOrders(res.data);
     } catch (error) {
       console.error("Error al cargar órdenes de pago pendiente", error);
@@ -71,7 +71,7 @@ export default function DashboardView() {
   const handleDeleteOrder = async (orderId: string) => {
     try {
       await axios.delete(`${import.meta.env.VITE_API_URL}/orders/${orderId}`);
-      const res = await axios.get("${import.meta.env.VITE_API_URL}/orders/in-progress");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/orders/in-progress`);
       setInProgressOrders(res.data);
     } catch (error) {
       console.error("Error al eliminar la orden:", error);
@@ -99,7 +99,7 @@ export default function DashboardView() {
 
   const fetchInProgressOrders = async () => {
     try {
-      const res = await axios.get("${import.meta.env.VITE_API_URL}/orders/in-progress");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/orders/in-progress`);
       setInProgressOrders(res.data);
     } catch (error) {
       console.error("Error al cargar órdenes en curso", error);
@@ -147,7 +147,7 @@ export default function DashboardView() {
       if (editingOrderId) {
         await axios.patch(`${import.meta.env.VITE_API_URL}/orders/${editingOrderId}`, payload);
       } else {
-        await axios.post("${import.meta.env.VITE_API_URL}/orders", payload);
+        await axios.post(`${import.meta.env.VITE_API_URL}/orders`, payload);
       }
 
       // resetear formulario

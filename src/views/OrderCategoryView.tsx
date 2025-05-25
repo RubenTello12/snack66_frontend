@@ -14,7 +14,7 @@ export default function OrderCategoryView() {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get("${import.meta.env.VITE_API_URL}/categories");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/categories`);
       setCategories(res.data);
     } catch (error) {
       console.error("Error al cargar categorías:", error);
