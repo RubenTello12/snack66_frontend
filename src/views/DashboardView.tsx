@@ -13,6 +13,8 @@ export default function DashboardView() {
   const { yellowLimit, redLimit } = useSettings();
   const [pendingOrders, setPendingOrders] = useState<any[]>([]);
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
+  const [notas, setNotas] = useState("");
+  const [payMethod, setPayMethod] = useState<{ [key: string]: string }>({});
 
   const { selectedProducts, addProduct, removeProduct, clearProducts } = useOrder();
   const navigate = useNavigate();
@@ -29,12 +31,17 @@ export default function DashboardView() {
 
   const markAsPaid = async (orderId: string) => {
     try {
-      await axios.patch(`${import.meta.env.VITE_API_URL}/orders/${orderId}/status`, { status: "pagado" });
-      setPendingOrders(prev => prev.filter(order => order._id !== orderId)); // eliminar de UI
+      await axios.patch(`${import.meta.env.VITE_API_URL}/orders/${orderId}/status`, {
+        status: "pagado",
+        paymethod: payMethod[orderId] || "cortesia"
+      });
+
+      setPendingOrders(prev => prev.filter(order => order._id !== orderId));
     } catch (error) {
       console.error("Error al marcar como pagada:", error);
     }
   };
+
 
   const markAsReady = async (orderId: string) => {
     try {
@@ -50,6 +57,12 @@ export default function DashboardView() {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/orders/pending-payment`);
       setPendingOrders(res.data);
+
+      const methods: { [key: string]: string } = {};
+      res.data.forEach((order: any) => {
+        methods[order._id] = order.payMethod || "";
+      });
+      setPayMethod(methods); 
     } catch (error) {
       console.error("Error al cargar órdenes de pago pendiente", error);
     }
@@ -79,12 +92,30 @@ export default function DashboardView() {
     }
   };
 
+  const handlePayMethodChange = async (orderId: string, newMethod: string) => {
+    try {
+      await axios.patch(`${import.meta.env.VITE_API_URL}/orders/${orderId}/payment`, {
+        paymMethod: newMethod,
+      });
+
+      setPayMethod((prev) => ({
+        ...prev,
+        [orderId]: newMethod,
+      }));
+
+    } catch (error) {
+      console.error("Error al actualizar forma de pago:", error);
+    }
+  };
+
+
   const handleEditOrder = (order: any) => {
     setEditingOrderId(order._id);
     setClient(order.client);
     setOrderType(order.type);
     setTable(order.table || "");
     setAddress(order.address || "");
+    setNotas(order.notas || "");
 
     const formattedProducts = order.products.map((p: any) => ({
       productId: p.product._id,
@@ -109,12 +140,14 @@ export default function DashboardView() {
   useEffect(() => {
     const savedData = localStorage.getItem("tempOrderData");
     if (savedData) {
-      const { client, table, address, orderType, editingOrderId } = JSON.parse(savedData);
+      const { client, table, address, orderType, editingOrderId, notas } = JSON.parse(savedData);
       setClient(client || "");
       setTable(table || "");
       setAddress(address || "");
       setOrderType(orderType || "restaurante");
       setEditingOrderId(editingOrderId || null);
+      setNotas(notas || "");
+      setPayMethod(payMethod || "efectivo");
       localStorage.removeItem("tempOrderData");
     }
 
@@ -141,6 +174,7 @@ export default function DashboardView() {
         quantity: 1,
         extras: p.extras,
       })),
+      notas,
     };
 
     try {
@@ -157,6 +191,7 @@ export default function DashboardView() {
       clearProducts();
       setEditingOrderId(null);
       fetchInProgressOrders(); // actualizar lista
+      setNotas("");
     } catch (error) {
       console.error("Error al enviar la orden", error);
     }
@@ -194,6 +229,12 @@ export default function DashboardView() {
                     </li>
                   ))}
                 </ul>
+
+                {order.notas && (
+                  <p className="mt-2 font-semibold text-sm">
+                    Nota: {order.notas}
+                  </p>
+                )}
 
                 <p>Total: ${order.total.toFixed(2)}</p>
 
@@ -279,7 +320,8 @@ export default function DashboardView() {
                 table,
                 address,
                 orderType,
-                editingOrderId
+                editingOrderId,
+                notas
               }));
               navigate("/ordenes/productos");
             }}
@@ -307,6 +349,13 @@ export default function DashboardView() {
               </button>
             </div>
           ))}
+
+          <textarea
+            placeholder="Notas para la orden (opcional)"
+            value={notas}
+            onChange={(e) => setNotas(e.target.value)}
+            className="p-2 rounded bg-white text-sm"
+          />
 
           <button
             className="bg-yellow-400 text-white font-bold py-2 px-6 mt-4 rounded cursor-pointer text-sm"
@@ -342,11 +391,30 @@ export default function DashboardView() {
 
                 <p>Total: ${order.total.toFixed(2)}</p>
 
+                <select
+                  value={payMethod[order._id] || ""}
+                  onChange={(e) => {
+                    const newMethod = e.target.value;
+                    setPayMethod((prev) => ({
+                      ...prev,
+                      [order._id]: newMethod
+                    }));
+                    handlePayMethodChange(order._id, newMethod);
+                  }}
+                  className="text-black p-1 rounded w-full bg-white"
+                >
+                  <option value="cortesia">Cortesía</option>
+                  <option value="efectivo">Efectivo</option>
+                  <option value="tarjeta">Tarjeta</option>
+                  <option value="transferencia">Transferencia</option>
+                </select>
+
+
                 <button
                   className="mt-4 bg-green-600 text-white w-full py-2 rounded hover:bg-green-700 text-sm"
                   onClick={() => markAsPaid(order._id)}
                 >
-                  Pagada
+                  Confirmar
                 </button>
               </div>
             ))}

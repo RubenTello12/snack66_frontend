@@ -22,6 +22,11 @@ export default function InventoryView() {
   const [editId, setEditId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteItem, setDeleteItem] = useState<InventoryItem | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+
   const fetchInventory = async () => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/inventory`);
     setItems(res.data);
@@ -56,9 +61,24 @@ export default function InventoryView() {
     setShowModal(true);
   };
 
-  const handleDelete = async (id: string) => {
-    await axios.delete(`${import.meta.env.VITE_API_URL}/inventory/${id}`);
-    fetchInventory();
+  const handleConfirmDelete = async () => {
+    if (!deleteItem || deleteConfirmText.trim().toLowerCase() !== deleteItem.name.trim().toLowerCase()) {
+      setDeleteError("El texto no coincide con el nombre del producto.");
+      return;
+    }
+
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/inventory/${deleteItem._id}`);
+      setItems(prev => prev.filter(i => i._id !== deleteItem._id));
+      setShowDeleteModal(false);
+    } catch (error: any) {
+      if (error.response?.status === 400) {
+        setDeleteError(error.response.data.message || "Este producto no puede ser eliminado.");
+      } else {
+        console.error("Error al eliminar producto:", error);
+        setDeleteError("Hubo un problema al eliminar el producto.");
+      }
+    }
   };
 
   const getColor = (item: InventoryItem) => {
@@ -112,7 +132,12 @@ export default function InventoryView() {
             <button onClick={() => handleEdit(item)}>
               <Pencil size={20} />
             </button>
-            <button onClick={() => handleDelete(item._id)}>
+            <button onClick={() => {
+              setDeleteItem(item);
+              setDeleteConfirmText("");
+              setDeleteError("");
+              setShowDeleteModal(true);
+            }}>
               <X size={20} />
             </button>
           </div>
@@ -174,6 +199,40 @@ export default function InventoryView() {
                   {isEditing ? "Actualizar" : "Guardar"}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && deleteItem && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-blue-500 p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h2 className="text-3xl font-bold mb-2 text-red-600 text-center">¿Seguro que quieres eliminar este producto?</h2>
+            <p className="text-white mb-4 text-center">
+              Para confirmar, escribe <span className="font-bold">"{deleteItem.name}" </span>
+               y asegurate de no tener este articulo dentro de una orden en curso
+            </p>
+            <input
+              type="text"
+              className="bg-white border-none p-2 rounded w-full mb-4"
+              placeholder="Escribe el nombre del producto"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+            />
+            {deleteError && <p className="text-red-500 text-sm mb-2">{deleteError}</p>}
+            <div className="flex justify-between">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+              >
+                Eliminar
+              </button>
             </div>
           </div>
         </div>
